@@ -1,0 +1,61 @@
+Virtual Private Cloud VPC hack session.txt
+
+- Review CIDR notation
+
+CIDR (Classless Inter-Domain Routing, sometimes called supernetting)
+
+Custom routing table
+Destination	Target
+10.0.0.0/16	local
+0.0.0.0/0	igw-id
+
+question: how does 0.0.0.0/0 match everything else?
+
+10.0.0.0/16 is a range of Private IP addresses
+
+Private IP Addresses
+CIDR notation	Subnet Mask	IP Range			Number of IPs
+10.0.0.0/8 	255.0.0.0	10.0.0.0 - 10.255.255.255	16,777,216
+172.16.0.0/12 	255.240.0.0	172.16.0.0 - 172.31.255.255	1,048,576
+192.168.0.0/16 	255.255.0.0	192.168.0.0 - 192.168.255.255	65,536
+
+10.0.0.0/8
+
+10.0.0.0 255.0.0.0
+
+10.0.0.0
+255.0.0.0
+
+0000 1010	0000 0000	0000 0000	0000 0000
+1111 1111	0000 0000	0000 0000	0000 0000
+
+low	0000 1010	0000 0000	0000 0000	0000 0000	167772160
+low+1	0000 1010	0000 0000	0000 0000	0000 0001	167772161
+low+2	0000 1010	0000 0000	0000 0000	0000 0010	167772162
+high	0000 1010	1111 1111	1111 1111	1111 1111	184549375
+
+184549375-167772160=16777215
+16777215+1=16777216
+
+question: where is the off by 1 error coming from?
+
+2-1=1
+1+1=2
+
+- Create decimal and binary converters
+
+cat /usr/local/bin/{bi,de}
+#!/usr/bin/env ruby
+puts ARGV
+.first
+.to_i
+.to_s(2)
+.rjust(32, "0")
+.scan(/.{8}/)
+.map { |o| o.scan(/.{4}/).join(" ") }
+.join("\t")
+#!/usr/bin/env ruby
+p ARGV
+.first
+.gsub(/\s/, "")
+.to_i(2)
